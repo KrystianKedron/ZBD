@@ -24,14 +24,49 @@ def generate_date(start_year, start_mount, start_day):
     return year, month[0], day[0]
 
 
-def parse_date(who_many, start_year, start_mount, start_day, delay):
+def generate_double_date_list(who_many, start_year, start_mount, start_day, delay):
 
+    tab_data = []
     for i in range(who_many):
         date = generate_date(start_year, start_mount, start_day)
         # czas umowy na max 6 lat (na sztywno)
         data_in, date_out = date, (date[0] + random.randrange(1, delay, 1), date[1], date[2])
         # Zatrudiony od, zatrudiony do
-        print data_in, date_out
+        tab_data.append([data_in, date_out])
+
+    return tab_data
+
+
+def parse_data_one_format(data):
+
+    list_parse = str(data).replace(',','-')
+    list_parse = list_parse.replace(' ','')
+    list_parse = list_parse.replace('(','')
+    return list_parse.replace(')','')
+
+
+def format_one_double_date_list(who_many, start_year, start_mount, start_day, delay):
+
+    _losowe_daty = generate_double_date_list(who_many, start_year, start_mount, start_day, delay)
+    losowa_data = []
+
+    for data in _losowe_daty:
+        losowa_data.append([parse_data_one_format(data[0]), parse_data_one_format(data[1])])
+
+    return losowa_data
+
+
+def format_one_date_list(who_many, start_year, start_mount, start_day):
+
+    tab_data = []
+    for i in range(who_many):
+        tab_data.append(generate_date(start_year, start_mount, start_day))
+
+    tab_parse_data = []
+    for data in tab_data:
+        tab_parse_data.append(parse_data_one_format(data))
+
+    return tab_parse_data
 
 
 def generate_list_from_file(file):
@@ -54,8 +89,9 @@ def generate_list_from_file(file):
 
 
 def parse_xml_street():
+
     import xml.etree.ElementTree as xml
-    print 'Otwieram xml'
+    print 'Otwieram xml street'
     xmltree = xml.parse('ULIC.xml')
     print 'Wczytano xml'
     print 'Prasuje xml'
@@ -75,10 +111,11 @@ def parse_xml_street():
 
 
 def get_city(ulice):
+
     import pandas
     import random
-    print 'Otwieram csv'
-    df=pandas.read_csv('simc.csv', encoding='utf-8', sep='\t',header=None)
+    print 'Otwieram csv city'
+    city_csv=pandas.read_csv('simc.csv', encoding='utf-8', sep='\t',header=None)
     print 'Otwarto'
     print 'Losuje liczbe'
     losuj_int = random.randrange(0, len(ulice), 1)
@@ -87,11 +124,24 @@ def get_city(ulice):
     street_id = int(ulice[losuj_int][0])
     print 'Wylosowano', street_name, street_id
     print 'Wyszukuje misto'
-    for i in range(1, len(df.values)):
-        if int(df.values[i][7]) == street_id:
-            city_name = df.values[i][6]
+    for i in range(1, len(city_csv.values)):
+        if int(city_csv.values[i][7]) == street_id:
+            city_name = city_csv.values[i][6]
 
     return street_name, city_name
+
+
+def generate_country_list():
+    import pandas
+
+    country =[]
+    print 'Otwieram csv country'
+    country_csv = pandas.read_csv('lista_krajow.csv', sep='\t', header=None)
+
+    for i in range(len(country_csv)):
+        country.append(str(country_csv.values[i][0]).split(',')[1])
+
+    return country
 
 ###################TESTS####################################
 
